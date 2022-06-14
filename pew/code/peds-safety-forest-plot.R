@@ -27,7 +27,8 @@ elog <- function(x) {
   return(exp(log(x)))
 }
 
-# Round in the way Excel does for consistency with other results.
+# Round in the way Excel does for consistency with other results. See
+# <https://stackoverflow.com/q/12688717>.
 round2 <- function(x, n) {
   posneg = sign(x)
   z = abs(x)*10^n
