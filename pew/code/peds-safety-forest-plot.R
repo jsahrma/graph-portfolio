@@ -40,11 +40,11 @@ round2 <- function(x, n) {
 print_est <- function(est, ll, ul) {
   paste0(
     format(round2(est, n = 2), nsmall = 2),
-    ' (',
+    " (",
     format(round2(ll, n = 2), nsmall = 2),
-    ', ',
+    ", ",
     format(round2(ul, n = 2), nsmall = 2),
-    ')')
+    ")")
 }
 
 
@@ -55,168 +55,143 @@ toplines <- 2
 
 ## Input data --------------------------------------------------------
 
-evt <- read_excel(
-  './rsc/peds_safety_eventCountsRatesREV_20220318.xlsx'
-) %>%
-  filter(
-    !(ade %in% c(
-      "vaginit", "tendinop", "renal_fail", "derm_severe", "sj",
-      "epiderm_necro", "rash", "urtic", "nausea", "abdom_pain",
-      "anaph", "angioed", "laryn_ed"))
-  ) %>%
-  filter(!(index_dx %in% c("asthma allergy", "asthma exac")))
+evt <- readxl::read_excel("../data/safety_event_counts_rates.xlsx")
 
-dat <- bind_rows(
+hr <- bind_rows(
+  readxl::read_excel(
+    "../data/safety_coxph.xlsx",
+    sheet = "supp otit adj", na = "."),
   read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'supp otit adj', na = '.'),
+    "../data/safety_coxph.xlsx",
+    sheet = "pharyn adj", na = "."),
   read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'pharyn adj', na = '.'),
+    "../data/safety_coxph.xlsx",
+    sheet = "sinusit adj", na = "."),
   read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'sinusit adj', na = '.'),
+    "../data/safety_coxph.xlsx",
+    sheet = "flu adj", na = "."),
   read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'flu adj', na = '.'),
+    "../data/safety_coxph.xlsx",
+    sheet = "viral uri adj", na = "."),
   read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'viral uri adj', na = '.'),
+    "../data/safety_coxph.xlsx",
+    sheet = "bronchiol adj", na = "."),
   read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'bronchiol adj', na = '.'),
+    "../data/safety_coxph.xlsx",
+    sheet = "bronchit adj", na = "."),
   read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'bronchit adj', na = '.'),
-  read_excel(
-    './rsc/peds_safety_coxphREV_20220317.xlsx',
-    sheet = 'nonsupp otit adj', na = '.')
-) %>%
-  filter(
-    !(ade %in% c(
-      "vaginit", "tendinop", "renal_fail", "derm_severe", "sj",
-      "epiderm_necro", "rash", "urtic", "nausea", "abdom_pain",
-      "anaph", "angioed", "laryn_ed"))
-  ) %>%
-  select(-c(Obs, effect)) %>%
-  mutate(
-    cohort = rep(
-      c("supp otit", "pharyn", "sinusit", "flu", "viral uri",
-        "bronchiol", "bronchit", "nonsupp otit"),
-      each = 6))
-
-dat[27, c("HR", "LCL", "UCL")] <- NA
-dat[45, c("HR", "LCL", "UCL")] <- NA
-dat[24, c("HR", "LCL", "UCL")] <- NA
+    "../data/safety_coxph.xlsx",
+    sheet = "nonsupp otit adj", na = ".")
+)
 
 
 c1 <- c(
-  rep('', times = toplines),
-  '',
-  '',
-  'Nausea/vomiting/abdominal pain',
-  '  Suppurative OM',
-  '  Pharyngitis',
-  '  Sinusitis',
-  '  Influenza',
-  '  Viral URI',
-  '  Bronchiolitis',
-  '  Bronchitis',
-  '  Non-suppurative OM',
-  '',
-  'Non-C. difficile diarrhea',
-  '  Suppurative OM',
-  '  Pharyngitis',
-  '  Sinusitis',
-  '  Influenza',
-  '  Viral URI',
-  '  Bronchiolitis',
-  '  Bronchitis',
-  '  Non-suppurative OM',
-  '',
-  'C. difficile infection',
-  '  Suppurative OM',
-  '  Pharyngitis',
-  '  Sinusitis',
-  '  Influenza',
-  '  Viral URI',
-  '  Bronchiolitis',
-  '  Bronchitis',
-  '  Non-suppurative OM',
-  '',
-  'Anaphylaxis/angioedema/laryngeal edema',
-  '  Suppurative OM',
-  '  Pharyngitis',
-  '  Sinusitis',
-  '  Influenza',
-  '  Viral URI',
-  '  Bronchiolitis',
-  '  Bronchitis',
-  '  Non-suppurative OM',
-  '',
-  'Skin rash/urticaria',
-  '  Suppurative OM',
-  '  Pharyngitis',
-  '  Sinusitis',
-  '  Influenza',
-  '  Viral URI',
-  '  Bronchiolitis',
-  '  Bronchitis',
-  '  Non-suppurative OM',
-  '',
-  'Unspecified allergy',
-  '  Suppurative OM',
-  '  Pharyngitis',
-  '  Sinusitis',
-  '  Influenza',
-  '  Viral URI',
-  '  Bronchiolitis',
-  '  Bronchitis',
-  '  Non-suppurative OM'
+  rep("", times = toplines),
+  "",
+  "",
+  "Nausea/vomiting/abdominal pain",
+  "  Suppurative OM",
+  "  Pharyngitis",
+  "  Sinusitis",
+  "  Influenza",
+  "  Viral URI",
+  "  Bronchiolitis",
+  "  Bronchitis",
+  "  Non-suppurative OM",
+  "",
+  "Non-C. difficile diarrhea",
+  "  Suppurative OM",
+  "  Pharyngitis",
+  "  Sinusitis",
+  "  Influenza",
+  "  Viral URI",
+  "  Bronchiolitis",
+  "  Bronchitis",
+  "  Non-suppurative OM",
+  "",
+  "C. difficile infection",
+  "  Suppurative OM",
+  "  Pharyngitis",
+  "  Sinusitis",
+  "  Influenza",
+  "  Viral URI",
+  "  Bronchiolitis",
+  "  Bronchitis",
+  "  Non-suppurative OM",
+  "",
+  "Anaphylaxis/angioedema/laryngeal edema",
+  "  Suppurative OM",
+  "  Pharyngitis",
+  "  Sinusitis",
+  "  Influenza",
+  "  Viral URI",
+  "  Bronchiolitis",
+  "  Bronchitis",
+  "  Non-suppurative OM",
+  "",
+  "Skin rash/urticaria",
+  "  Suppurative OM",
+  "  Pharyngitis",
+  "  Sinusitis",
+  "  Influenza",
+  "  Viral URI",
+  "  Bronchiolitis",
+  "  Bronchitis",
+  "  Non-suppurative OM",
+  "",
+  "Unspecified allergy",
+  "  Suppurative OM",
+  "  Pharyngitis",
+  "  Sinusitis",
+  "  Influenza",
+  "  Viral URI",
+  "  Bronchiolitis",
+  "  Bronchitis",
+  "  Non-suppurative OM"
 )
 c2 <- c(
-  rep('', times = toplines),
-  'Appropriate', 'Agent',
-  '',
-  evt$events_approp[1:8], '',
-  '',
-  evt$events_approp[9:16], '',
-  '',
-  evt$events_approp[17:24], '',
-  '',
-  evt$events_approp[25:32], '',
-  '',
-  evt$events_approp[33:40], '',
-  '',
+  rep("", times = toplines),
+  "Appropriate", "Agent",
+  "",
+  evt$events_approp[1:8], "",
+  "",
+  evt$events_approp[9:16], "",
+  "",
+  evt$events_approp[17:24], "",
+  "",
+  evt$events_approp[25:32], "",
+  "",
+  evt$events_approp[33:40], "",
+  "",
   evt$events_approp[41:48]
 )
 c3 <- c(
-  rep('', times = toplines),
-  'Inappropriate', 'Agent',
-  '',
-  evt$events_inappr[1:8], '',
-  '',
-  evt$events_inappr[9:16], '',
-  '',
-  evt$events_inappr[17:24], '',
-  '',
-  evt$events_inappr[25:32], '',
-  '',
-  evt$events_inappr[33:40], '',
-  '',
+  rep("", times = toplines),
+  "Inappropriate", "Agent",
+  "",
+  evt$events_inappr[1:8], "",
+  "",
+  evt$events_inappr[9:16], "",
+  "",
+  evt$events_inappr[17:24], "",
+  "",
+  evt$events_inappr[25:32], "",
+  "",
+  evt$events_inappr[33:40], "",
+  "",
   evt$events_inappr[41:48]
 )
 
-derm <- filter(dat, ade == 'derm')
-gast <- filter(dat, ade == 'gastro')
-nonc <- filter(dat, ade == 'non_cdiff')
-cdff <- filter(dat, ade == 'cdiff')
-hgen <- filter(dat, ade == 'hypersens_gen')
-hypr <- filter(dat, ade == 'hypersens')
+derm <- filter(hr, ade == "derm")
+gast <- filter(hr, ade == "gastro")
+nonc <- filter(hr, ade == "non_cdiff")
+cdff <- filter(hr, ade == "cdiff")
+hgen <- filter(hr, ade == "hypersens_gen")
+hypr <- filter(hr, ade == "hypersens")
 c4 <- c(
-  rep('', times = toplines),
-  'Weighted HR', '(95% CI)',
-  '',
+  rep("", times = toplines),
+  "Weighted HR", "(95% CI)",
+  "",
   print_est(gast$HR[1], gast$LCL[1], gast$UCL[1]),
   print_est(gast$HR[2], gast$LCL[2], gast$UCL[2]),
   print_est(gast$HR[3], gast$LCL[3], gast$UCL[3]),
@@ -225,7 +200,7 @@ c4 <- c(
   print_est(gast$HR[6], gast$LCL[6], gast$UCL[6]),
   print_est(gast$HR[7], gast$LCL[7], gast$UCL[7]),
   print_est(gast$HR[8], gast$LCL[8], gast$UCL[8]),
-  '', '',
+  "", "",
   print_est(nonc$HR[1], nonc$LCL[1], nonc$UCL[1]),
   print_est(nonc$HR[2], nonc$LCL[2], nonc$UCL[2]),
   print_est(nonc$HR[3], nonc$LCL[3], nonc$UCL[3]),
@@ -234,25 +209,25 @@ c4 <- c(
   print_est(nonc$HR[6], nonc$LCL[6], nonc$UCL[6]),
   print_est(nonc$HR[7], nonc$LCL[7], nonc$UCL[7]),
   print_est(nonc$HR[8], nonc$LCL[8], nonc$UCL[8]),
-  '', '',
+  "", "",
   print_est(cdff$HR[1], cdff$LCL[1], cdff$UCL[1]),
   print_est(cdff$HR[2], cdff$LCL[2], cdff$UCL[2]),
   print_est(cdff$HR[3], cdff$LCL[3], cdff$UCL[3]),
-  'NE',
-  'NE',
-  'NE',
-  'NE',
-  'NE',
-  '', '',
+  "NE",
+  "NE",
+  "NE",
+  "NE",
+  "NE",
+  "", "",
   print_est(hgen$HR[1], hgen$LCL[1], hgen$UCL[1]),
   print_est(hgen$HR[2], hgen$LCL[2], hgen$UCL[2]),
   print_est(hgen$HR[3], hgen$LCL[3], hgen$UCL[3]),
-  'NE',
+  "NE",
   print_est(hgen$HR[5], hgen$LCL[5], hgen$UCL[5]),
-  'NE',
-  'NE',
+  "NE",
+  "NE",
   print_est(hgen$HR[8], hgen$LCL[8], hgen$UCL[8]),
-  '', '',
+  "", "",
   print_est(derm$HR[1], derm$LCL[1], derm$UCL[1]),
   print_est(derm$HR[2], derm$LCL[2], derm$UCL[2]),
   print_est(derm$HR[3], derm$LCL[3], derm$UCL[3]),
@@ -261,13 +236,13 @@ c4 <- c(
   print_est(derm$HR[6], derm$LCL[6], derm$UCL[6]),
   print_est(derm$HR[7], derm$LCL[7], derm$UCL[7]),
   print_est(derm$HR[8], derm$LCL[8], derm$UCL[8]),
-  '', '',
+  "", "",
   print_est(hypr$HR[1], hypr$LCL[1], hypr$UCL[1]),
   print_est(hypr$HR[2], hypr$LCL[2], hypr$UCL[2]),
   print_est(hypr$HR[3], hypr$LCL[3], hypr$UCL[3]),
-  'NE',
+  "NE",
   print_est(hypr$HR[5], hypr$LCL[5], hypr$UCL[5]),
-  'NE',
+  "NE",
   print_est(hypr$HR[7], hypr$LCL[7], hypr$UCL[7]),
   print_est(hypr$HR[8], hypr$LCL[8], hypr$UCL[8])
 )
@@ -335,88 +310,67 @@ summaryp <- c(
   TRUE, rep(FALSE, times = 8)
 )
 
-## cairo_pdf('./out/peds_safety_forestplot_20220323.pdf', width = 14, height = 18.5)
-setEPS()
-postscript(
-  file = "./out/peds_safety_forestplot_20220323.eps", width = 14, height = 18.5)
-grid.rect(
-  x = unit(.5, "npc"), y = unit(.893, "npc"),
-  width = unit(.98, "npc"), height = unit(.045, "npc"),
-  gp = gpar(fill = "gray90", col = "gray90"))
-grid.rect(
-  x = unit(.5, "npc"), y = unit(.744, "npc"),
-  width = unit(.98, "npc"), height = unit(.045, "npc"),
-  gp = gpar(fill = "gray90", col = "gray90"))
-grid.rect(
-  x = unit(.5, "npc"), y = unit(.595, "npc"),
-  width = unit(.98, "npc"), height = unit(.045, "npc"),
-  gp = gpar(fill = "gray90", col = "gray90"))
-grid.rect(
-  x = unit(.5, "npc"), y = unit(.446, "npc"),
-  width = unit(.98, "npc"), height = unit(.045, "npc"),
-  gp = gpar(fill = "gray90", col = "gray90"))
-grid.rect(
-  x = unit(.5, "npc"), y = unit(.297, "npc"),
-  width = unit(.98, "npc"), height = unit(.045, "npc"),
-  gp = gpar(fill = "gray90", col = "gray90"))
-grid.rect(
-  x = unit(.5, "npc"), y = unit(.148, "npc"),
-  width = unit(.98, "npc"), height = unit(.045, "npc"),
-  gp = gpar(fill = "gray90", col = "gray90"))
-## grid.rect(
-##   x = unit(.5, "npc"), y = unit(.893, "npc"),
-##   width = unit(.98, "npc"), height = unit(.045, "npc"),
-##   gp = gpar(col = "lightgray", fill = 0))
-## grid.rect(
-##   x = unit(.5, "npc"), y = unit(.744, "npc"),
-##   width = unit(.98, "npc"), height = unit(.045, "npc"),
-##   gp = gpar(col = "lightgray"))
-## grid.rect(
-##   x = unit(.5, "npc"), y = unit(.595, "npc"),
-##   width = unit(.98, "npc"), height = unit(.045, "npc"),
-##   gp = gpar(col = "lightgray"))
-## grid.rect(
-##   x = unit(.5, "npc"), y = unit(.446, "npc"),
-##   width = unit(.98, "npc"), height = unit(.045, "npc"),
-##   gp = gpar(col = "lightgray"))
-## grid.rect(
-##   x = unit(.5, "npc"), y = unit(.297, "npc"),
-##   width = unit(.98, "npc"), height = unit(.045, "npc"),
-##   gp = gpar(col = "lightgray"))
-## grid.rect(
-##   x = unit(.5, "npc"), y = unit(.148, "npc"),
-##   width = unit(.98, "npc"), height = unit(.045, "npc"),
-##   gp = gpar(col = "lightgray"))
-forestplot(
+cairo_pdf(
+  "../output/safety_forestplot.pdf", width = 14, height = 18.5)
+
+grid::grid.rect(
+  x = grid::unit(.5, "npc"), y = grid::unit(.893, "npc"),
+  width = grid::unit(.98, "npc"), height = grid::unit(.045, "npc"),
+  gp = grid::gpar(fill = "gray90", col = "gray90"))
+grid::grid.rect(
+  x = grid::unit(.5, "npc"), y = grid::unit(.744, "npc"),
+  width = grid::unit(.98, "npc"), height = grid::unit(.045, "npc"),
+  gp = grid::gpar(fill = "gray90", col = "gray90"))
+grid::grid.rect(
+  x = grid::unit(.5, "npc"), y = grid::unit(.595, "npc"),
+  width = grid::unit(.98, "npc"), height = grid::unit(.045, "npc"),
+  gp = grid::gpar(fill = "gray90", col = "gray90"))
+grid::grid.rect(
+  x = grid::unit(.5, "npc"), y = grid::unit(.446, "npc"),
+  width = grid::unit(.98, "npc"), height = grid::unit(.045, "npc"),
+  gp = grid::gpar(fill = "gray90", col = "gray90"))
+grid::grid.rect(
+  x = grid::unit(.5, "npc"), y = grid::unit(.297, "npc"),
+  width = grid::unit(.98, "npc"), height = grid::unit(.045, "npc"),
+  gp = grid::gpar(fill = "gray90", col = "gray90"))
+grid::grid.rect(
+  x = grid::unit(.5, "npc"), y = grid::unit(.148, "npc"),
+  width = grid::unit(.98, "npc"), height = grid::unit(.045, "npc"),
+  gp = grid::gpar(fill = "gray90", col = "gray90"))
+
+forestplot::forestplot(
   cex = 1.2,
   labeltext = table_text, mean = est, lower = lcl, upper = ucl,
   align = c('l', 'c', 'c', 'c', 'c'),
   graph.pos = 5,
-  hrzl_lines = list('5' = gpar(col = 'black')),
+  hrzl_lines = list('5' = grid::gpar(col = 'black')),
   clip = c(0.45, 5.55),
   is.summary = summaryp,
-  txt_gp = fpTxtGp(
-    label = gpar(cex = 1.0),
-    xlab = gpar(cex = 1.1),
-    ticks = gpar(cex = 1.1)),
+  txt_gp = forestplot::fpTxtGp(
+    label = grid::gpar(cex = 1.0),
+    xlab = grid::gpar(cex = 1.1),
+    ticks = grid::gpar(cex = 1.1)),
   xlog = TRUE,
   xlab = 'HR (95% CI)',
   lwd.zero = 2, boxsize = 0.3, lwd.ci = 2, lwd.xaxis = 2,
   ci.vertices.height = 0.15,
-  col = fpColors(line = 'black'),
-  xticks = c(elog(0.5), elog(1.5), elog(2.5), elog(3.5), elog(4.5), elog(5.5)),
+  col = forestplot::fpColors(line = 'black'),
+  xticks = c(
+    elog(0.5), elog(1.5), elog(2.5), elog(3.5), elog(4.5), elog(5.5)),
   new_page = FALSE
 )
-grid.text(
+
+grid::grid.text(
   "Inappropriate agent\nnonharmful",
-  x = unit(.8045, "npc"), y = unit(.9450, "npc"), just = "right",
-  gp=gpar(col="black", fontface = "bold", cex = 1.1))
-grid.text(
+  x = grid::unit(.8045, "npc"), y = grid::unit(.9450, "npc"), just = "right",
+  gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
+grid::grid.text(
   "Inappropriate agent\nharmful",
-  x = unit(.8148, "npc"), y = unit(.9450, "npc"), just = "left",
-  gp=gpar(col="black", fontface = "bold", cex = 1.1))
-grid.text(
+  x = grid::unit(.8148, "npc"), y = grid::unit(.9450, "npc"), just = "left",
+  gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
+grid::grid.text(
   "No. of events\n(Rate per 10,000 person-days)",
-  x = unit(.427, "npc"), y = unit(.9800, "npc"), just = "center",
-  gp=gpar(col="black", fontface = "bold", cex = 1.1))
+  x = grid::unit(.432, "npc"), y = grid::unit(.9800, "npc"), just = "center",
+  gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
+
 dev.off()
