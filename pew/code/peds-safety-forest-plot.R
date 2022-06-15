@@ -10,7 +10,7 @@
 ## 2022;5(5):e2214153. doi:10.1001/jamanetworkopen.2022.14153
 ##
 ## John Sahrmann
-## 20220613
+## 20220614
 
 
 ## Setup -------------------------------------------------------------
@@ -22,13 +22,14 @@ library(readxl)
 
 ## Function definitions ----------------------------------------------
 
-
-elog <- function(x) {
-  return(exp(log(x)))
-}
-
-# Round in the way Excel does for consistency with other results. See
-# <https://stackoverflow.com/q/12688717>.
+#' Round x to n digits. This is meant to reproduce the behavior of
+#' Excel's ROUND function, which is needed for consistency with other
+#' results in the project. See <https://stackoverflow.com/q/12688717>.
+#'
+#' @param x Numeric vector
+#' @param n Number of digits
+#' @examples
+#' round2(c(1.245, 1.115, 1.709), n = 2)
 round2 <- function(x, n) {
   posneg = sign(x)
   z = abs(x)*10^n
@@ -38,6 +39,16 @@ round2 <- function(x, n) {
   return(z*posneg)
 }
 
+
+#' Produce a string of the form "est (ll, ul)" where each value is
+#' rounded to two decimal places and where trailing zeros are
+#' retained.
+#'
+#' @param est Number (in this case, a hazard ratio estimate)
+#' @param ll Number (lower confidence limit)
+#' @param ul Number (upper confidence limit)
+#' @examples
+#' print_est(1.195123, 1.100375, 1.29803)
 print_est <- function(est, ll, ul) {
   paste0(
     format(round2(est, n = 2), nsmall = 2),
@@ -51,13 +62,18 @@ print_est <- function(est, ll, ul) {
 
 ## Constants ---------------------------------------------------------
 
+# Number of extra lines of space to retain at the top of the plot for
+# annotations.
 toplines <- 2
 
 
 ## Input data --------------------------------------------------------
 
+# Read the Excel sheet with safety event counts and rates.
 evt <- readxl::read_excel("../data/safety_event_counts_rates.xlsx")
 
+# Read and stack the Excel sheets with hazard ratio estimates and
+# confidence intervals.
 hr <- bind_rows(
   readxl::read_excel(
     "../data/safety_coxph.xlsx",
@@ -86,6 +102,10 @@ hr <- bind_rows(
 )
 
 
+## Plot text ---------------------------------------------------------
+
+# Produce the text for the first column in the forest plot, which will
+# display names of safety events and the study cohorts.
 c1 <- c(
   rep("", times = toplines),
   "",
@@ -150,6 +170,10 @@ c1 <- c(
   "  Bronchitis",
   "  Non-suppurative OM"
 )
+
+# Produce the text for the second column in the forest plot, which
+# will display event counts and rates for the appropriately treated
+# subgroup.
 c2 <- c(
   rep("", times = toplines),
   "Appropriate", "Agent",
@@ -166,6 +190,10 @@ c2 <- c(
   "",
   evt$events_approp[41:48]
 )
+
+# Produce the text for the third column in the forest plot, which will
+# display event counts and rates for the inappropriately treated
+# subgroup.
 c3 <- c(
   rep("", times = toplines),
   "Inappropriate", "Agent",
@@ -183,6 +211,10 @@ c3 <- c(
   evt$events_inappr[41:48]
 )
 
+# Produce the text for the fourth column in the forest plot, which
+# will display hazard ratios and 95% confidence intervals. 'NE' stands
+# for 'not estimable' and corresponds to cohorts that did not have at
+# least five events of the particular safety outcome.
 derm <- filter(hr, ade == "derm")
 gast <- filter(hr, ade == "gastro")
 nonc <- filter(hr, ade == "non_cdiff")
@@ -248,58 +280,63 @@ c4 <- c(
   print_est(hypr$HR[8], hypr$LCL[8], hypr$UCL[8])
 )
 
+# Produce vectors of hazard ratios and lower and upper 95% confidence
+# limits that will be used in the actual plotting.
 est <- c(
   rep(NA, times = toplines),
   NA, NA,
-  NA, elog(gast$HR[1]), elog(gast$HR[2]), elog(gast$HR[3]), elog(gast$HR[4]),
-  elog(gast$HR[5]), elog(gast$HR[6]), elog(gast$HR[7]), elog(gast$HR[8]), NA,
-  NA, elog(nonc$HR[1]), elog(nonc$HR[2]), elog(nonc$HR[3]), elog(nonc$HR[4]),
-  elog(nonc$HR[5]), elog(nonc$HR[6]), elog(nonc$HR[7]), elog(nonc$HR[8]), NA,
-  NA, elog(cdff$HR[1]), elog(cdff$HR[2]), elog(cdff$HR[3]), elog(cdff$HR[4]),
-  elog(cdff$HR[5]), elog(cdff$HR[6]), elog(cdff$HR[7]), elog(cdff$HR[8]), NA,
-  NA, elog(hgen$HR[1]), elog(hgen$HR[2]), elog(hgen$HR[3]), elog(hgen$HR[4]),
-  elog(hgen$HR[5]), elog(hgen$HR[6]), elog(hgen$HR[7]), elog(hgen$HR[8]), NA,
-  NA, elog(derm$HR[1]), elog(derm$HR[2]), elog(derm$HR[3]), elog(derm$HR[4]),
-  elog(derm$HR[5]), elog(derm$HR[6]), elog(derm$HR[7]), elog(derm$HR[8]), NA,
-  NA, elog(hypr$HR[1]), elog(hypr$HR[2]), elog(hypr$HR[3]), elog(hypr$HR[4]),
-  elog(hypr$HR[5]), elog(hypr$HR[6]), elog(hypr$HR[7]), elog(hypr$HR[8])
+  NA, gast$HR[1], gast$HR[2], gast$HR[3], gast$HR[4],
+  gast$HR[5], gast$HR[6], gast$HR[7], gast$HR[8], NA,
+  NA, nonc$HR[1], nonc$HR[2], nonc$HR[3], nonc$HR[4],
+  nonc$HR[5], nonc$HR[6], nonc$HR[7], nonc$HR[8], NA,
+  NA, cdff$HR[1], cdff$HR[2], cdff$HR[3], cdff$HR[4],
+  cdff$HR[5], cdff$HR[6], cdff$HR[7], cdff$HR[8], NA,
+  NA, hgen$HR[1], hgen$HR[2], hgen$HR[3], hgen$HR[4],
+  hgen$HR[5], hgen$HR[6], hgen$HR[7], hgen$HR[8], NA,
+  NA, derm$HR[1], derm$HR[2], derm$HR[3], derm$HR[4],
+  derm$HR[5], derm$HR[6], derm$HR[7], derm$HR[8], NA,
+  NA, hypr$HR[1], hypr$HR[2], hypr$HR[3], hypr$HR[4],
+  hypr$HR[5], hypr$HR[6], hypr$HR[7], hypr$HR[8]
 )
 lcl <- c(
   rep(NA, times = toplines),
   NA, NA,
-  NA, elog(gast$LCL[1]), elog(gast$LCL[2]), elog(gast$LCL[3]), elog(gast$LCL[4]),
-  elog(gast$LCL[5]), elog(gast$LCL[6]), elog(gast$LCL[7]), elog(gast$LCL[8]), NA,
-  NA, elog(nonc$LCL[1]), elog(nonc$LCL[2]), elog(nonc$LCL[3]), elog(nonc$LCL[4]),
-  elog(nonc$LCL[5]), elog(nonc$LCL[6]), elog(nonc$LCL[7]), elog(nonc$LCL[8]), NA,
-  NA, elog(cdff$LCL[1]), elog(cdff$LCL[2]), elog(cdff$LCL[3]), elog(cdff$LCL[4]),
-  elog(cdff$LCL[5]), elog(cdff$LCL[6]), elog(cdff$LCL[7]), elog(cdff$LCL[8]), NA,
-  NA, elog(hgen$LCL[1]), elog(hgen$LCL[2]), elog(hgen$LCL[3]), elog(hgen$LCL[4]),
-  elog(hgen$LCL[5]), elog(hgen$LCL[6]), elog(hgen$LCL[7]), elog(hgen$LCL[8]), NA,
-  NA, elog(derm$LCL[1]), elog(derm$LCL[2]), elog(derm$LCL[3]), elog(derm$LCL[4]),
-  elog(derm$LCL[5]), elog(derm$LCL[6]), elog(derm$LCL[7]), elog(derm$LCL[8]), NA,
-  NA, elog(hypr$LCL[1]), elog(hypr$LCL[2]), elog(hypr$LCL[3]), elog(hypr$LCL[4]),
-  elog(hypr$LCL[5]), elog(hypr$LCL[6]), elog(hypr$LCL[7]), elog(hypr$LCL[8])
+  NA, gast$LCL[1], gast$LCL[2], gast$LCL[3], gast$LCL[4],
+  gast$LCL[5], gast$LCL[6], gast$LCL[7], gast$LCL[8], NA,
+  NA, nonc$LCL[1], nonc$LCL[2], nonc$LCL[3], nonc$LCL[4],
+  nonc$LCL[5], nonc$LCL[6], nonc$LCL[7], nonc$LCL[8], NA,
+  NA, cdff$LCL[1], cdff$LCL[2], cdff$LCL[3], cdff$LCL[4],
+  cdff$LCL[5], cdff$LCL[6], cdff$LCL[7], cdff$LCL[8], NA,
+  NA, hgen$LCL[1], hgen$LCL[2], hgen$LCL[3], hgen$LCL[4],
+  hgen$LCL[5], hgen$LCL[6], hgen$LCL[7], hgen$LCL[8], NA,
+  NA, derm$LCL[1], derm$LCL[2], derm$LCL[3], derm$LCL[4],
+  derm$LCL[5], derm$LCL[6], derm$LCL[7], derm$LCL[8], NA,
+  NA, hypr$LCL[1], hypr$LCL[2], hypr$LCL[3], hypr$LCL[4],
+  hypr$LCL[5], hypr$LCL[6], hypr$LCL[7], hypr$LCL[8]
 )
 ucl <- c(
   rep(NA, times = toplines),
   NA, NA,
-  NA, elog(gast$UCL[1]), elog(gast$UCL[2]), elog(gast$UCL[3]), elog(gast$UCL[4]),
-  elog(gast$UCL[5]), elog(gast$UCL[6]), elog(gast$UCL[7]), elog(gast$UCL[8]), NA,
-  NA, elog(nonc$UCL[1]), elog(nonc$UCL[2]), elog(nonc$UCL[3]), elog(nonc$UCL[4]),
-  elog(nonc$UCL[5]), elog(nonc$UCL[6]), elog(nonc$UCL[7]), elog(nonc$UCL[8]), NA,
-  NA, elog(cdff$UCL[1]), elog(cdff$UCL[2]), elog(cdff$UCL[3]), elog(cdff$UCL[4]),
-  elog(cdff$UCL[5]), elog(cdff$UCL[6]), elog(cdff$UCL[7]), elog(cdff$UCL[8]), NA,
-  NA, elog(hgen$UCL[1]), elog(hgen$UCL[2]), elog(hgen$UCL[3]), elog(hgen$UCL[4]),
-  elog(hgen$UCL[5]), elog(hgen$UCL[6]), elog(hgen$UCL[7]), elog(hgen$UCL[8]), NA,
-  NA, elog(derm$UCL[1]), elog(derm$UCL[2]), elog(derm$UCL[3]), elog(derm$UCL[4]),
-  elog(derm$UCL[5]), elog(derm$UCL[6]), elog(derm$UCL[7]), elog(derm$UCL[8]), NA,
-  NA, elog(hypr$UCL[1]), elog(hypr$UCL[2]), elog(hypr$UCL[3]), elog(hypr$UCL[4]),
-  elog(hypr$UCL[5]), elog(hypr$UCL[6]), elog(hypr$UCL[7]), elog(hypr$UCL[8])
+  NA, gast$UCL[1], gast$UCL[2], gast$UCL[3], gast$UCL[4],
+  gast$UCL[5], gast$UCL[6], gast$UCL[7], gast$UCL[8], NA,
+  NA, nonc$UCL[1], nonc$UCL[2], nonc$UCL[3], nonc$UCL[4],
+  nonc$UCL[5], nonc$UCL[6], nonc$UCL[7], nonc$UCL[8], NA,
+  NA, cdff$UCL[1], cdff$UCL[2], cdff$UCL[3], cdff$UCL[4],
+  cdff$UCL[5], cdff$UCL[6], cdff$UCL[7], cdff$UCL[8], NA,
+  NA, hgen$UCL[1], hgen$UCL[2], hgen$UCL[3], hgen$UCL[4],
+  hgen$UCL[5], hgen$UCL[6], hgen$UCL[7], hgen$UCL[8], NA,
+  NA, derm$UCL[1], derm$UCL[2], derm$UCL[3], derm$UCL[4],
+  derm$UCL[5], derm$UCL[6], derm$UCL[7], derm$UCL[8], NA,
+  NA, hypr$UCL[1], hypr$UCL[2], hypr$UCL[3], hypr$UCL[4],
+  hypr$UCL[5], hypr$UCL[6], hypr$UCL[7], hypr$UCL[8]
 )
 
-
+# Combine the text columns.
 table_text <- cbind(c1, c2, c3, c4)
 
+# Define a Boolean vector for whether each row of text represents a
+# 'summary', which in practical terms means that it will appear in
+# bold font.
 summaryp <- c(
   rep(TRUE, times = toplines),
   TRUE, TRUE,
@@ -311,9 +348,15 @@ summaryp <- c(
   TRUE, rep(FALSE, times = 8)
 )
 
+
+## Plotting ----------------------------------------------------------
+
 cairo_pdf(
   "../output/safety_forestplot.pdf", width = 14, height = 18.5)
 
+# Place gray rectangles on the canvas to help visually distinguish
+# between the bacterial infection cohorts and the viral infection
+# cohorts.
 grid::grid.rect(
   x = grid::unit(.5, "npc"), y = grid::unit(.893, "npc"),
   width = grid::unit(.98, "npc"), height = grid::unit(.045, "npc"),
@@ -357,18 +400,24 @@ forestplot::forestplot(
   ci.vertices.height = 0.15,
   col = forestplot::fpColors(line = 'black'),
   xticks = c(
-    elog(0.5), elog(1.5), elog(2.5), elog(3.5), elog(4.5), elog(5.5)),
+    (0.5), (1.5), (2.5), (3.5), (4.5), (5.5)),
   new_page = FALSE
 )
 
-grid::grid.text(
-  "Inappropriate agent\nnonharmful",
-  x = grid::unit(.8045, "npc"), y = grid::unit(.9450, "npc"), just = "right",
-  gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
+# Add annotations to make clear what region of the plot corresponds to
+# estimates that indicate a protective effect of appropriate treatment
+# versus the region that corresponds to estimates that indicate a
+# protective effect of inappropriate treatment. 
 grid::grid.text(
   "Inappropriate agent\nharmful",
   x = grid::unit(.8148, "npc"), y = grid::unit(.9450, "npc"), just = "left",
   gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
+grid::grid.text(
+  "Inappropriate agent\nnonharmful",
+  x = grid::unit(.8045, "npc"), y = grid::unit(.9450, "npc"), just = "right",
+  gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
+
+# Add an annotation to provide context for the event rate estimates.
 grid::grid.text(
   "No. of events\n(Rate per 10,000 person-days)",
   x = grid::unit(.432, "npc"), y = grid::unit(.9800, "npc"), just = "center",
