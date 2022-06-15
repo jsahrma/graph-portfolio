@@ -58,7 +58,7 @@ pa1000_first_year <- pa1000 %>%
 ## Clustering --------------------------------------------------------
 
 png(
-  "../output/clusters2.png", width = 2000, height = 1900, res = 150)
+  "../output/clusters.png", width = 2000, height = 1900, res = 150)
 gplots::heatmap.2(
     x = as.matrix(pa1000_first_year), Rowv = TRUE, Colv = FALSE,
     distfun = function(x) dist(x, method = 'euclidean'),
