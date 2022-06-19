@@ -27,9 +27,6 @@ library(readr)
 library(sf)
 library(stringr)
 
-
-## Constant definitions ----------------------------------------------
-
 # Create a temporary directory to store the GIS files extracted from
 # the zip archive.
 temp <- tempfile()
@@ -84,6 +81,7 @@ fl_cty_gis_2019 <- sf::read_sf(
 fl_cty_pop_est_2019 <- fl_cty_pop_est_2019 %>%
   dplyr::select(ctyfips, TOT_POP)
 
+# Ditto for the GIS data set.
 fl_cty_gis_2019 <- fl_cty_gis_2019 %>%
   dplyr::select(ctyfips, geometry)
 
@@ -99,12 +97,14 @@ fl_cty_opioids_incid_rate_map_2019 <-
   )
 
 
-
 ## Mapping -----------------------------------------------------------
 
 # Plot the county-level incidence rates. Rates are mapped using a
 # continuous fill scale. Counties with insufficient data are plotted
 # separately in gray.
+png(
+  "../output/fl_opioid_incidence_map_2019.png",
+  width = 1000, height = 1000, res = 150)
 ggplot() +
   geom_sf(
     aes(fill = incid_rate_per_1e5_pop, geometry = geometry),
@@ -130,3 +130,4 @@ ggplot() +
     location = "tr", which_north = "grid", 
     pad_x = unit(0.5, "in"), pad_y = unit(0.5, "in"),
     style = north_arrow_fancy_orienteering)
+dev.off()
