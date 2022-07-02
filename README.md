@@ -21,3 +21,5 @@ This map was prepared as an example for the course "Using Administrative Data fo
 The course teaches students at the School of Medicine the basics of working with administrative healthcare data. A major part of that is learning the programming skills needed to open, manipulate, and analyze data sources. The Spring 2022 semester saw the transition from SAS to R programming, where this example was designed for a module on special topics. Updated course materials are currently being migrated to [this repository](https://github.com/jsahrma/admin-data-course).
 
 ![Incidence of opioid-related admissions in the state of Florida in 2019](/flom/output/fl_opioid_incidence_map_2019.png)
+
+**_Note:_** This is not meant as a rigorous or authoritative analysis of this issue.
