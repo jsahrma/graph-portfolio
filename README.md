@@ -23,3 +23,12 @@ The course teaches students at the School of Medicine the basics of working with
 ![Incidence of opioid-related admissions in the state of Florida in 2019](/flom/output/fl_opioid_incidence_map_2019.png)
 
 **_Note:_** This is not meant as a rigorous or authoritative analysis of this issue.
+
+
+## Forest Plot of Survival Analysis Effect Estimates
+
+The forest plot below summarizes the results of an extensive set of analyses comparing safety outcomes in a sample of privately insured children across the U.S. diagnosed with common bacterial and viral infections. (Results of the [full study](https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2792723) were published in the journal *JAMA Network Open* in May 2022.) Patients were grouped into cohorts based on the type of infection diagnosed, and treatment was defined as appropriate (guideline-recommended therapy for bacterial infection cohorts and no antibiotic for viral infection cohorts) or inappropriate (non-guideline-recommended therapy for bacterial infection cohorts and any antibiotic for viral infection cohorts). Weights derived from propensity scores were used to achieve exchangeability between treatment groups within each cohort. Cox proportional hazards models were then used to compare risk of each safety outcome following initial treatment.
+
+Much of the work in creating the plot is encapsulated by the `forestplot` function defined in a package of the same name, although there's a significant amount of work required to prepare the text and estimates for plotting. Other adornments were added by leveraging the lower-level functions provided by the *grid* package. Text annotations were added to the top of the plot to provide context to the event rate calculations shown in the middle two columns and to indicate what regions of the forest plot represent a protective effect of appropriate or inappropriate treatment. Gray backgrounds were added to help visually distinguish between the bacterial infection and viral infection cohorts.
+
+![Forest plot of survival analysis effect estimates of pediatric antibiotics safety study](/pew/output/safety_forestplot.png)

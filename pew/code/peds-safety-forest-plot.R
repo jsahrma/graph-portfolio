@@ -351,8 +351,10 @@ summaryp <- c(
 
 ## Plotting ----------------------------------------------------------
 
-cairo_pdf(
-  "../output/safety_forestplot.pdf", width = 14, height = 18.5)
+png(
+  "../output/safety_forestplot.png", width = 1400, height = 1800,
+  pointsize = 16
+)
 
 # Place gray rectangles on the canvas to help visually distinguish
 # between the bacterial infection cohorts and the viral infection
@@ -410,11 +412,11 @@ forestplot::forestplot(
 # protective effect of inappropriate treatment. 
 grid::grid.text(
   "Inappropriate agent\nharmful",
-  x = grid::unit(.8148, "npc"), y = grid::unit(.9450, "npc"), just = "left",
+  x = grid::unit(.8148, "npc"), y = grid::unit(.9475, "npc"), just = "left",
   gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
 grid::grid.text(
   "Inappropriate agent\nnonharmful",
-  x = grid::unit(.8045, "npc"), y = grid::unit(.9450, "npc"), just = "right",
+  x = grid::unit(.8045, "npc"), y = grid::unit(.9475, "npc"), just = "right",
   gp=grid::gpar(col="black", fontface = "bold", cex = 1.1))
 
 # Add an annotation to provide context for the event rate estimates.
