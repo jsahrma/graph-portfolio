@@ -7,31 +7,7 @@
 ## I've done for the Alliance for Contraception in Cats and Dogs on a
 ## study looking at the association between spay/neuter status and
 ## subsequent weight gain in dogs. (Code for this project can be found
-## at <https://github.com/jsahrma/accd-oo>.) The model upon which the
-## analyses are based contains several interactions terms, which make
-## straightforward interpretation of coefficients impossible. Rather,
-## effects are contingent on a combination of age, sex, and breed
-## size. To ease interpretation, I created effect plots that display
-## hazard ratios for a wide array of characteristics.
-##
-## The graph below was constructed so that within sex and breed size
-## class, a dog at one year of age is used as the reference. Points
-## above 1.0 on the y-axis correspond to ages at spay/neuter
-## associated with a higher risk of lifetime overweight/obese status
-## compared to dogs with the same characteristics spayed/neutered at
-## one year of age; the converse is true for points below 1.0 on the
-## y-axis. For example, female toy/small dogs neutered at two years of
-## age face an approximately 50% higher risk of subsequently being
-## recorded as overweight/obese compared to female toy/small dogs
-## neutered at one year of age. The overall trend is that spay/neuter
-## at later ages is associated with higher risk than younger ages
-## (with the noticeable exception of large breed dogs). This pattern
-## is more pronounced in male dogs, but it's less clear that there's a
-## trend with breed size.
-##
-## The decision whether and when to spay/neuter a dog requires
-## balancing many different factors; these results provide additional
-## information on just one aspect of that decision.
+## at <https://github.com/jsahrma/accd-oo>.)
 ##
 ## John Sahrmann
 ## 20220710
