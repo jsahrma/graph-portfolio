@@ -3,6 +3,17 @@
 This repository contains a sample of the graphs I've produced throughout my career.
 
 
+## Effect plots for a time-to-event analysis
+
+This figure plots hazard ratios for an analysis looking at the effect of age at spay/neuter on risk of subsequent weight gain in dogs. This work constitutes a piece of the data analysis consulting work I've done for the Alliance for Contraception in Cats and Dogs. (Code for this project can be found at <https://github.com/jsahrma/accd-oo>.) The model upon which the analyses are based contains several interactions terms, which make straightforward interpretation of coefficients impossible. Rather, effects are contingent on a combination of age, sex, and breed size. To ease interpretation, I created effect plots that display hazard ratios for a wide array of characteristics.
+
+![Effect plot of age at S/N on risk of weight gain in dogs](oo-age-effect-among-SN-1-year.png)
+
+The graph below was constructed so that within sex and breed size class, a dog at one year of age is used as the reference. Points above 1.0 on the $y$-axis correspond to ages at spay/neuter associated with a higher risk of lifetime overweight/obese status compared to dogs with the same characteristics spayed/neutered at one year of age; the converse is true for points below 1.0 on the $y$-axis. For example, female toy/small dogs neutered at two years of age face an approximately 50% higher risk of subsequently being recorded as overweight/obese compared to female toy/small dogs neutered at one year of age. The overall trend is that spay/neuter at later ages is associated with higher risk than younger ages (with the noticeable exception of large breed dogs). This pattern is more pronounced in male dogs, but it's less clear that there's a trend with breed size.
+
+The decision whether and when to spay/neuter a dog requires balancing many different factors; these results provide additional information on just one aspect of that decision.
+
+
 ## Heat map / dendrogram of childhood vaccine histories
 
 This plot was made as part of a (currently unpublished) project investigating patterns of the timing of childhood vaccinations and in particular patterns of delay (or outright skipping) of different vaccines in a sample of privately insured children. The data were deidentified and a small amount of noise added to the vaccination dates prior to plotting.
